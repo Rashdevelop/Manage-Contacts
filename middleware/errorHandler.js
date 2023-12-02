@@ -1,41 +1,43 @@
+const {constants} =require("../constants.js");
 const errorHandler=(err,req,res,next)=>{
 const statusCode=res.statusCode ? res.statusCode:500;
 switch(statusCode){
-    case 400:
+    case constants.VALIDATION_ERROR:
         res.json({
-            title:"Bad Requests",
+            title:"validation failed",
             message:err.message,
             stackTrace:err.stack
         });
         break;
-    case 401:
+    case constants.UNAUTHORIZED:
         res.json({
             title:"Unauthorised",
             message:err.message,
             stackTrace:err.stack
        });
        break;
-    case 403:
+    case constants.FORBIDDEN:
         res.json({
             title:"Forbidden",
             message:err.message,
             stackTrace:err.stack
        });
        break;
-    case 404:
+    case constants.NOT_FOUND:
         res.json({
-            title:"Not Found",
+            title:"not found",
             message:err.message,
             stackTrace:err.stack
        });
        break;
-    case 404:
+    case constants.SERVER_ERROR:
         res.json({
-            title:"Not Found",
+            title:"server error",
             message:err.message,
             stackTrace:err.stack
        });
        break;
     default:
+        console.log("no errpr all good");
 }};
 module.exports=errorHandler;

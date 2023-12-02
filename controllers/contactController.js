@@ -1,36 +1,64 @@
-const getAllContact=(req,res)=>{
+const asyncHandler=require("express-async-handler");
+const Contact=require("../models/contactsModel");
+const getAllContact=asyncHandler(async(req,res)=>{
+    const contacts=await Contact.find();
     res.status(200).json({
-        message:"get all contacts"
+        contacts,
     })
-}
-const createContact=(req,res)=>{
-    const {name, email, number}=req.body;
-    if(!name || !email || !number){
+});
+const createContact=asyncHandler(async(req,res)=>{
+    const {name, email, phone}=req.body;
+    if(!name || !email || !phone){
         res.status(400);
         throw new Error("all fields are mandatory");
     }
+    const contact=await Contact.create({
+        name,
+        email,
+        phone
+    });
     res.status(201).json({
-        message:"create contact"
-    })
-}
-const getContact=(req,res)=>{
-    res.status(200).json({
-        message:`get contact for ${req.params.id}`
+      contact
     });
-}
-const updateContact=(req,res)=>{
+});
+const getContact=asyncHandler(async(req,res)=>{
+    const contact=await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
     res.status(200).json({
-        message:`update contact for ${req.params.id}`
+        contact,
     });
-}
-const deleteContact=(req,res)=>{
+});
+const updateContact=asyncHandler(async(req,res)=>{
+    const contact=Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    const updatedContact=await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new:true}
+        );
     res.status(200).json({
-        message:`delted contact for ${req.params.id}`
+        updatedContact,
     });
-}
+});
+const deleteContact=asyncHandler(async(req,res)=>{
+    const contact=await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    await Contact.remove();
+    res.status(200).json(contact);
+});
 module.exports={
     getAllContact,
     createContact,
     getContact,
     updateContact,
-    deleteContact};
+    deleteContact
+};
